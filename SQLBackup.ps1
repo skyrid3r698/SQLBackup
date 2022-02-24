@@ -37,7 +37,7 @@ Invoke-WebRequest -Uri https://ola.hallengren.com/scripts/MaintenanceSolution.sq
 
 
 #backuppfad festlegen
-Write-Output "Das SQL-Skript wird in C:\OLA\Scripts\MaintananceSolutionEdited.sql geschrieben und muss nach diesem Setup manuell in dem SQL-Server ausgeführt werden!" -ForegroundColor Yellow
+Write-Host "Das SQL-Skript wird in C:\OLA\Scripts\MaintananceSolutionEdited.sql geschrieben und muss nach diesem Setup manuell in dem SQL-Server ausgeführt werden!" -ForegroundColor Yellow
 
 $location = Read-Host 'Backupziel(Schreibweise D:\ELOBACKUP\BACKUP)'
 $deletebackupafter = Read-Host 'Nach wie vielen Stunden soll das Backup gelöscht werden (Schreibweise 72)'
