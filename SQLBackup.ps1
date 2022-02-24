@@ -42,13 +42,17 @@ Invoke-WebRequest -Uri https://ola.hallengren.com/scripts/MaintenanceSolution.sq
 Write-Output "Das SQL-Skript liegt unter C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql und muss manuell angepasst und in dem SQL-Server ausgeführt werden!"
 
 $location = Read-Host 'Backupziel(Schreibweise D:\ELOBACKUP\BACKUP)'
-mkdir $location
+$PathBackup = Test-Path $location
+If($PathBackup -eq "True") {
+}
+else { 
+	mkdir $location
+	Write-Host "Backup-Pfad $location angelegt!" -ForegroundColor Green
+}
 
+#Edit and create Scripts
 $sqluser = Read-Host 'Benutzer für Anmeldung an den SQL Server (Bsp.'"$env:USERDomain\$env:USERNAME"')'
-
-
 $sqldatabase = Read-Host 'Auf welche Datenbank wurde das SQL-Skript geschrieben? Bsp. master' 
-
 $SQLInstanz = Read-Host 'SQL-Server(Schreibweise SERVER\INSTANZ)'
 cd C:\OLA\Scripts\
 $CommandLogCleanup = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""DELETE FROM dbo.CommandLog WHERE StartTime < DATEADD(dd, -30, GETDATE());"" -b -o C:\OLA\Logs\CommandLogCleanup.txt"
@@ -99,12 +103,9 @@ $Monitoring | out-file Monitoring.cmd -Encoding ascii
 
 
 
-
-
-
 [DateTime]$Time = Read-Host 'Uhrzeit des Starts der Maintenance Skripte(Bsp.: 05:00)'
 
-
+##Create MS Tasks
 #IndexOptimizeSystemDatabases
 [string]$TaskName = "Index Optimization - System Databases"
 [string]$TaskBeschrieb = "Diese Aufgabe Optimiert den Index der master und msdb"
