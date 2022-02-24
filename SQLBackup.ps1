@@ -39,9 +39,10 @@ Invoke-WebRequest -Uri https://ola.hallengren.com/scripts/MaintenanceSolution.sq
 
 
 #backuppfad festlegen
-Write-Output "Das SQL-Skript liegt unter C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql und muss manuell angepasst und in dem SQL-Server ausgeführt werden!"
+Write-Output "Das SQL-Skript liegt unter C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql und muss manuell in dem SQL-Server ausgeführt werden!"
 
 $location = Read-Host 'Backupziel(Schreibweise D:\ELOBACKUP\BACKUP)'
+$deletebackupafter = Read-Host 'Nach wie vielen Stunden soll das Backup gelöscht werden (Schreibweise 72)'
 $PathBackup = Test-Path $location
 If($PathBackup -eq "True") {
 }
@@ -49,6 +50,10 @@ else {
 	mkdir $location
 	Write-Host "Backup-Pfad $location angelegt!" -ForegroundColor Green
 }
+
+#Edit MaintananceSolution.sql
+Get-Content C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql | Foreach-Object {$_.Replace('DECLARE @BackupDirectory nvarchar(max)     = NULL', "DECLARE @BackupDirectory nvarchar(max)     = '$location'")} | Set-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql
+Get-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql | Foreach-Object {$_.Replace('DECLARE @CleanupTime int                   = NULL', "DECLARE @CleanupTime int                   = $deletebackupafter")} | Set-Content C:\OLA\Scripts\MaintananceSolutionEdited.sql
 
 #Edit and create Scripts
 $sqluser = Read-Host 'Benutzer für Anmeldung an den SQL Server (Bsp.'"$env:USERDomain\$env:USERNAME"')'
