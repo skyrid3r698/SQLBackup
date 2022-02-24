@@ -17,8 +17,6 @@ If(-Not $installed) {
 }
 
 #Download SQL Script + Anlage erforderlicher Pfade
-Write-Output "Das Setup wird die Maintanance Solution von Ola Hallengren herunterladen und vorbereiten. SQLcmd muss installiert sein. Einverstanden?"
-pause
 $PathScripts = Test-Path C:\OLA\Scripts\
 $PathLogs = Test-Path C:\OLA\Logs\
 If($PathScripts -eq "True") {
@@ -39,7 +37,7 @@ Invoke-WebRequest -Uri https://ola.hallengren.com/scripts/MaintenanceSolution.sq
 
 
 #backuppfad festlegen
-Write-Output "Das SQL-Skript liegt unter C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql und muss manuell in dem SQL-Server ausgeführt werden!"
+Write-Output "Das SQL-Skript wird in C:\OLA\Scripts\MaintananceSolutionEdited.sql geschrieben und muss nach diesem Setup manuell in dem SQL-Server ausgeführt werden!" -ForegroundColor Yellow
 
 $location = Read-Host 'Backupziel(Schreibweise D:\ELOBACKUP\BACKUP)'
 $deletebackupafter = Read-Host 'Nach wie vielen Stunden soll das Backup gelöscht werden (Schreibweise 72)'
@@ -56,8 +54,8 @@ Get-Content C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql | Foreach-O
 Get-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql | Foreach-Object {$_.Replace('DECLARE @CleanupTime int                   = NULL', "DECLARE @CleanupTime int                   = $deletebackupafter")} | Set-Content C:\OLA\Scripts\MaintananceSolutionEdited.sql
 
 #Edit and create Scripts
-$sqluser = Read-Host 'Benutzer für Anmeldung an den SQL Server (Bsp.'"$env:USERDomain\$env:USERNAME"')'
-$sqldatabase = Read-Host 'Auf welche Datenbank wurde das SQL-Skript geschrieben? Bsp. master' 
+$sqluser = Read-Host 'Benutzer für Anmeldung an den SQL Server (Current User:'"$env:USERDomain\$env:USERNAME"')'
+$sqldatabase = Read-Host 'Auf welche Datenbank wird das SQL-Skript geschrieben? Bsp. master' 
 $SQLInstanz = Read-Host 'SQL-Server(Schreibweise SERVER\INSTANZ)'
 cd C:\OLA\Scripts\
 $CommandLogCleanup = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""DELETE FROM dbo.CommandLog WHERE StartTime < DATEADD(dd, -30, GETDATE());"" -b -o C:\OLA\Logs\CommandLogCleanup.txt"
