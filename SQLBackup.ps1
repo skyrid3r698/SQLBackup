@@ -54,7 +54,7 @@ Get-Content C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql | Foreach-O
 Get-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql | Foreach-Object {$_.Replace('DECLARE @CleanupTime int                   = NULL', "DECLARE @CleanupTime int                   = $deletebackupafter")} | Set-Content C:\OLA\Scripts\MaintananceSolutionEdited.sql
 
 #Edit and create Scripts
-$sqluser = Read-Host 'Benutzer für Anmeldung an den SQL Server (Current User:'"$env:USERDomain\$env:USERNAME"')'
+$sqluser = Read-Host 'Benutzer für Anmeldung an den SQL Server (Aktuell angemeldet:'"$env:USERDomain\$env:USERNAME"')'
 $sqldatabase = Read-Host 'Auf welche Datenbank wird das SQL-Skript geschrieben? Bsp. master' 
 $SQLInstanz = Read-Host 'SQL-Server(Schreibweise SERVER\INSTANZ)'
 cd C:\OLA\Scripts\
