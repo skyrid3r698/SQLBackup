@@ -55,8 +55,10 @@ Get-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql | Foreach-Objec
 
 #Edit and create Scripts
 $sqluser = Read-Host 'Benutzer für Anmeldung an den SQL Server (Aktuell angemeldet:'"$env:USERDomain\$env:USERNAME"')'
-$sqldatabase = Read-Host 'Auf welche Datenbank wird das SQL-Skript geschrieben? Bsp. master' 
-$SQLInstanz = Read-Host 'SQL-Server(Schreibweise SERVER\INSTANZ)'
+if ($sqluser -eq [string]::empty) { $sqluser = "$env:USERDomain\$env:USERNAME" }
+$sqldatabase = Read-Host 'Auf welche Datenbank wird das SQL-Skript geschrieben? (Aktuell ausgewählt: master)'
+if ($sqluser -eq [string]::empty) { $sqldatabase = "master" }
+$SQLInstanz = Read-Host 'SQL-Server (Schreibweise: '"$env:COMPUTERNAME\INSTANZNAME"')'
 cd C:\OLA\Scripts\
 $CommandLogCleanup = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""DELETE FROM dbo.CommandLog WHERE StartTime < DATEADD(dd, -30, GETDATE());"" -b -o C:\OLA\Logs\CommandLogCleanup.txt"
 $CommandLogCleanup | out-file CommandLogCleanup.cmd -Encoding ascii
