@@ -13,7 +13,6 @@ If ((New-Object Security.Principal.WindowsPrincipal $IsAdmin).IsInRole([Security
 Write-Host $(Get-Date)"[INFO]Start Logging:"
 Start-Transcript -Append C:\OLA\Logs\log2.txt
 
-
 #Check if sqlcmd is installed
 $software = "Microsoft Befehlszeilenprogramme 15 für SQL Server";
 $installed = $null -ne (Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object { $_.DisplayName -eq $software })
@@ -23,8 +22,6 @@ If(-Not $installed) {
 } else {
 	Write-Host $(Get-Date)"[INFO]'$software' or SQLcmd is installed"
 }
-
-
 
 # GUI Window
 Add-Type -assembly System.Windows.Forms
@@ -209,7 +206,6 @@ else {
     exit
 }
 
-
 #Download SQL Script + Create paths
 $PathScripts = Test-Path C:\OLA\Scripts\
 $PathLogs = Test-Path C:\OLA\Logs\
@@ -226,7 +222,6 @@ if($PathLogs -eq "True") { Write-Host $(Get-Date)"[INFO]C:\OLA\Logs is available
 $PathSQLScript = Test-Path C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql
 if($PathSQLScript -eq "True") { Write-Host $(Get-Date)"[INFO]MaintananceSolution.sql successfully downloaded to" C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql} else {Write-Host $(Get-Date)"[ERROR]MaintanenceSolution.sql could not be downloaded. Check your internet connection!" -ForegroundColor Red}
 
-
 #Log Message
 Write-Host $(Get-Date)"[WARN]The SQL Script is going to be written to C:\OLA\Scripts\MaintananceSolutionEdited.sql and has to be run manually after creation" -ForegroundColor Yellow
 
@@ -242,6 +237,15 @@ $sqldatabase = $TextboxSQLDB.Text
 $SQLLogDir = $textboxLogDir.Text
 $SQLInstanz = $textboxSQLInst.Text
 [DateTime]$Time = $textboxTime.Text
+
+#Write configfile
+Out-File C:\OLA\config.cfg -Encoding ascii -InputObject $username
+Add-Content C:\OLA\config.cfg $deletebackupafter
+Add-Content C:\OLA\config.cfg $PathBackup
+Add-Content C:\OLA\config.cfg $sqldatabase
+Add-Content C:\OLA\config.cfg $SQLLogDir
+Add-Content C:\OLA\config.cfg $SQLInstanz
+Add-Content C:\OLA\config.cfg $Time
 
 #Edit MaintananceSolution.sql
 Get-Content C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql | Foreach-Object {$_.Replace('DECLARE @BackupDirectory nvarchar(max)     = NULL', "DECLARE @BackupDirectory nvarchar(max)     = '$location'")} | Set-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql
@@ -290,7 +294,6 @@ $IndexOptimizeUserDatabases | out-file IndexOptimizeUserDatabases.cmd -Encoding 
 
 $Monitoring = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""SELECT cl.ID, cl.DatabaseName, cl.CommandType, cl.StartTime, cl.EndTime, cl.ErrorNumber FROM master.dbo.CommandLog AS cl WHERE (cl.ErrorNumber <> 0) ORDER BY cl.ID DESC;"" -b -o C:\OLA\Logs\monitoring.txt"
 $Monitoring | out-file Monitoring.cmd -Encoding ascii
-
 
 ##Create MS Tasks
 #IndexOptimizeSystemDatabases
