@@ -175,7 +175,7 @@ $main.Controls.Add($textbox2)
 #Label Info
 $LabelInfo = New-Object System.Windows.Forms.Label
 $LabelInfo.Text = "[i]Scripts and Logs will be written to C:\OLA\"
-$LabelInfo.Location  = '5,5'
+$LabelInfo.Location  = '5,550'
 $LabelInfo.AutoSize = $true
 #$LabelInfo.Font = New-Object System.Drawing.Font("Arial",12,[System.Drawing.FontStyle]::Bold)
 $main.Controls.Add($LabelInfo)
