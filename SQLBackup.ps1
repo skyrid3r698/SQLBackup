@@ -206,6 +206,7 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK)
 }
 else {
     Write-Host $(Get-Date)"[INFO]Setup cancelled!" -ForegroundColor Red
+    exit
 }
 
 
