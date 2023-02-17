@@ -24,22 +24,6 @@ If(-Not $installed) {
 	Write-Host $(Get-Date)"[INFO]'$software' bzw. SQLcmd ist installiert."
 }
 
-#Download SQL Script + Create paths
-$PathScripts = Test-Path C:\OLA\Scripts\
-$PathLogs = Test-Path C:\OLA\Logs\
-If($PathScripts -eq "True") {} else {mkdir C:\OLA\Scripts\ | Out-Null}
-If($PathLogs -eq "True") {} else {mkdir C:\OLA\Logs\ | Out-Null}
-Invoke-WebRequest -Uri https://ola.hallengren.com/scripts/MaintenanceSolution.sql -OutFile C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql
-# Check if paths are created
-$PathScripts = Test-Path C:\OLA\Scripts\
-$PathLogs = Test-Path C:\OLA\Logs\
-if($PathScripts -eq "True") { Write-Host $(Get-Date)"[INFO]C:\OLA\Scripts is available"} else {Write-Host $(Get-Date)"[ERROR]C:\OLA\Scripts clould not be created. Check privilege or drive letter!" -ForegroundColor Red}
-if($PathLogs -eq "True") { Write-Host $(Get-Date)"[INFO]C:\OLA\Logs is available"} else {Write-Host $(Get-Date)"[ERROR]C:\OLA\Scripts clould not be created. Check privilege or drive letter" -ForegroundColor Red}
-
-# Check if the file has been downloaded
-$PathSQLScript = Test-Path C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql
-if($PathSQLScript -eq "True") { Write-Host $(Get-Date)"[INFO]MaintananceSolution.sql successfully downloaded to" C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql} else {Write-Host $(Get-Date)"[ERROR]MaintanenceSolution.sql could not be downloaded. Check your internet connection!" -ForegroundColor Red}
-
 
 
 # GUI Window
@@ -188,6 +172,14 @@ $textbox2.Text = "72"
 $textbox2.Width += 150
 $main.Controls.Add($textbox2)
 
+#Label Info
+$LabelInfo = New-Object System.Windows.Forms.Label
+$LabelInfo.Text = "[i]Scripts and Logs will be written to C:\OLA\"
+$LabelInfo.Location  = '5,5'
+$LabelInfo.AutoSize = $true
+#$LabelInfo.Font = New-Object System.Drawing.Font("Arial",12,[System.Drawing.FontStyle]::Bold)
+$main.Controls.Add($LabelInfo)
+
 # OK Button
 $okButton = New-Object System.Windows.Forms.Button
 $okButton.Location = New-Object System.Drawing.Point(550,500)
@@ -215,6 +207,24 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK)
 else {
     Write-Host $(Get-Date)"[INFO]Setup cancelled!" -ForegroundColor Red
 }
+
+
+#Download SQL Script + Create paths
+$PathScripts = Test-Path C:\OLA\Scripts\
+$PathLogs = Test-Path C:\OLA\Logs\
+If($PathScripts -eq "True") {} else {mkdir C:\OLA\Scripts\ | Out-Null}
+If($PathLogs -eq "True") {} else {mkdir C:\OLA\Logs\ | Out-Null}
+Invoke-WebRequest -Uri https://ola.hallengren.com/scripts/MaintenanceSolution.sql -OutFile C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql
+# Check if paths are created
+$PathScripts = Test-Path C:\OLA\Scripts\
+$PathLogs = Test-Path C:\OLA\Logs\
+if($PathScripts -eq "True") { Write-Host $(Get-Date)"[INFO]C:\OLA\Scripts is available"} else {Write-Host $(Get-Date)"[ERROR]C:\OLA\Scripts clould not be created. Check privilege or drive letter!" -ForegroundColor Red}
+if($PathLogs -eq "True") { Write-Host $(Get-Date)"[INFO]C:\OLA\Logs is available"} else {Write-Host $(Get-Date)"[ERROR]C:\OLA\Scripts clould not be created. Check privilege or drive letter" -ForegroundColor Red}
+
+# Check if the file has been downloaded
+$PathSQLScript = Test-Path C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql
+if($PathSQLScript -eq "True") { Write-Host $(Get-Date)"[INFO]MaintananceSolution.sql successfully downloaded to" C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql} else {Write-Host $(Get-Date)"[ERROR]MaintanenceSolution.sql could not be downloaded. Check your internet connection!" -ForegroundColor Red}
+
 
 #Log Message
 Write-Host $(Get-Date)"[WARN]The SQL Script is going to be written to C:\OLA\Scripts\MaintananceSolutionEdited.sql and has to be run manually after creation" -ForegroundColor Yellow
