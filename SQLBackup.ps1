@@ -22,7 +22,8 @@ If(-Not $installed) {Write-Host $(Get-Date)"[ERROR]'$software' or SQLCmd couldn'
 #Read Config if available
 $configfile = Test-Path C:\OLA\config.cfg
 if ($configfile -eq "True") {
-    $username = (Get-Content C:\OLA\config.cfg -TotalCount 1)[-1]
+    $username = Get-Content C:\OLA\config.cfg -TotalCount 1
+    $PathBackup = (Get-Content C:\OLA\config.cfg -TotalCount 2)[-1]
 } 
 else {
     $username = "$env:USERDomain\$env:USERNAME"
@@ -181,6 +182,16 @@ $LabelInfo.Location  = '5,550'
 $LabelInfo.AutoSize = $true
 #$LabelInfo.Font = New-Object System.Drawing.Font("Arial",12,[System.Drawing.FontStyle]::Bold)
 $main.Controls.Add($LabelInfo)
+
+#Label Info2
+if ($configfile -eq "True") {
+    $LabelInfo2 = New-Object System.Windows.Forms.Label
+    $LabelInfo2.Text = "[i]Config has been read from C:\OLA\config.cfg"
+    $LabelInfo2.Location  = '5,570'
+    $LabelInfo2.AutoSize = $true
+    #$LabelInfo2.Font = New-Object System.Drawing.Font("Arial",12,[System.Drawing.FontStyle]::Bold)
+    $main.Controls.Add($LabelInfo2)
+}
 
 # OK Button
 $okButton = New-Object System.Windows.Forms.Button
