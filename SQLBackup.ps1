@@ -16,7 +16,7 @@ Start-Transcript -Append C:\OLA\Logs\log2.txt
 
 #Check if sqlcmd is installed
 $software = "Microsoft Befehlszeilenprogramme 15 für SQL Server";
-$installed = (Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where { $_.DisplayName -eq $software }) -ne $null
+$installed = $null -ne (Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object { $_.DisplayName -eq $software })
 
 If(-Not $installed) {
 	Write-Host $(Get-Date)"[ERROR]'$software' bzw. SQLCmd konnte nicht gefunden werden. Die Software ist, für ein funktionierendes Backup, zwingend notwendig. Fortfahren auf eigene Verantwortung!" -ForegroundColor Red; 
@@ -216,29 +216,31 @@ else {
     Write-Host $(Get-Date)"[INFO]Setup cancelled!" -ForegroundColor Red
 }
 
-#backuppfad festlegen
+#Log Message
 Write-Host $(Get-Date)"[WARN]The SQL Script is going to be written to C:\OLA\Scripts\MaintananceSolutionEdited.sql and has to be run manually after creation" -ForegroundColor Yellow
+
+#set variables from userinput
 $username = $textbox1.Text
 $deletebackupafter = $textbox2.Text
 $PathBackup = Test-Path $foldername1
 If($PathBackup -eq "True") {}
-else { mkdir $foldername1 | Out-Null
-}
+else { mkdir $foldername1 | Out-Null}
 $PathBackup = Test-Path $foldername1
 if($PathBackup -eq "True") { Write-Host $(Get-Date)"[INFO]'$foldername1' is available"} else {Write-Host $(Get-Date)"[ERROR]'$foldername1' clould not be created. Check privilege or drive letter!" -ForegroundColor Red}
 $sqldatabase = $TextboxSQLDB.Text
+$SQLLogDir = $textboxLogDir.Text
+$SQLInstanz = $textboxSQLInst.Text
+[DateTime]$Time = $textboxTime.Text
 
 #Edit MaintananceSolution.sql
 Get-Content C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql | Foreach-Object {$_.Replace('DECLARE @BackupDirectory nvarchar(max)     = NULL', "DECLARE @BackupDirectory nvarchar(max)     = '$location'")} | Set-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql
 Get-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql | Foreach-Object {$_.Replace('DECLARE @CleanupTime int                   = NULL', "DECLARE @CleanupTime int                   = $deletebackupafter")} | Set-Content C:\OLA\Scripts\MaintananceSolutionEdited.sql
 
 #Edit and create Scripts
-$SQLInstanz = $textboxSQLInst.Text
-cd C:\OLA\Scripts\
+Set-Location C:\OLA\Scripts\
 $CommandLogCleanup = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""DELETE FROM dbo.CommandLog WHERE StartTime < DATEADD(dd, -30, GETDATE());"" -b -o C:\OLA\Logs\CommandLogCleanup.txt"
 $CommandLogCleanup | out-file CommandLogCleanup.cmd -Encoding ascii
 
-$SQLLogDir = $textboxLogDir.Text
 $OutFileCleanup = @"
 @echo off
 set _SQLLOGDIR_=$SQLLogDir
@@ -278,9 +280,6 @@ $IndexOptimizeUserDatabases | out-file IndexOptimizeUserDatabases.cmd -Encoding 
 $Monitoring = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""SELECT cl.ID, cl.DatabaseName, cl.CommandType, cl.StartTime, cl.EndTime, cl.ErrorNumber FROM master.dbo.CommandLog AS cl WHERE (cl.ErrorNumber <> 0) ORDER BY cl.ID DESC;"" -b -o C:\OLA\Logs\monitoring.txt"
 $Monitoring | out-file Monitoring.cmd -Encoding ascii
 
-
-
-[DateTime]$Time = $textboxTime.Text
 
 ##Create MS Tasks
 #IndexOptimizeSystemDatabases
