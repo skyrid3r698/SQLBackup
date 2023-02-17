@@ -17,10 +17,15 @@ Start-Transcript -Append C:\OLA\Logs\log2.txt
 $software = "Microsoft Befehlszeilenprogramme 15 für SQL Server";
 $installed = $null -ne (Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object { $_.DisplayName -eq $software })
 
-If(-Not $installed) {
-	Write-Host $(Get-Date)"[ERROR]'$software' or SQLCmd couldn't be found. This Software is needed for this Skript to work. Continue only if you know it is installed and working!" -ForegroundColor Red; 
-} else {
-	Write-Host $(Get-Date)"[INFO]'$software' or SQLcmd is installed"
+If(-Not $installed) {Write-Host $(Get-Date)"[ERROR]'$software' or SQLCmd couldn't be found. This Software is needed for this Skript to work. Continue only if you know it is installed and working!" -ForegroundColor Red;} else {Write-Host $(Get-Date)"[INFO]'$software' or SQLcmd is installed"}
+
+#Read Config if available
+$configfile = Test-Path C:\OLA\config.cfg
+if ($configfile -eq "True") {
+    $username = (Get-Content C:\OLA\config.cfg -TotalCount 1)[-1]
+} 
+else {
+    $username = "$env:USERDomain\$env:USERNAME"
 }
 
 # GUI Window
@@ -111,7 +116,7 @@ $main.Controls.Add($Label1)
 $textbox1 = New-Object System.Windows.Forms.TextBox
 $textbox1.Location = '10,145'
 $textbox1.Width += 50
-$textbox1.Text = "$env:USERDomain\$env:USERNAME"
+$textbox1.Text = "$username"
 $main.Controls.Add($textbox1)
 
 #SQLDB
