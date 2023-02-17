@@ -270,7 +270,7 @@ Add-Content C:\OLA\config.cfg $Time
 Write-Host $(Get-Date)"[INFO]Config has been written to C:\OLA\config.cfg"
 
 #Edit MaintananceSolution.sql
-Get-Content C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql | Foreach-Object {$_.Replace('DECLARE @BackupDirectory nvarchar(max)     = NULL', "DECLARE @BackupDirectory nvarchar(max)     = '$location'")} | Set-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql
+Get-Content C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql | Foreach-Object {$_.Replace('DECLARE @BackupDirectory nvarchar(max)     = NULL', "DECLARE @BackupDirectory nvarchar(max)     = '$PathBackup'")} | Set-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql
 Get-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql | Foreach-Object {$_.Replace('DECLARE @CleanupTime int                   = NULL', "DECLARE @CleanupTime int                   = $deletebackupafter")} | Set-Content C:\OLA\Scripts\MaintananceSolutionEdited.sql
 
 #Edit and create Scripts
@@ -293,13 +293,13 @@ $DeleteBackupHistory | out-file DeleteBackupHistory.cmd -Encoding ascii
 $PurgeJobHistory = "sqlcmd -E -S $SQLInstanz -d msdb -Q ""DECLARE @CleanupDate datetime; SET @CleanupDate = DATEADD(dd, -30, GETDATE()); EXECUTE dbo.sp_purge_jobhistory @oldest_date = @CleanupDate;"" -b -o C:\OLA\Logs\PurgeJobHistory.txt"
 $PurgeJobHistory | out-file PurgeJobHistory.cmd -Encoding ascii
 
-$DatabaseBackupSystemDatabasesFull = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseBackup @Databases = 'SYSTEM_DATABASES', @Directory = '$location', @BackupType = 'FULL', @Verify = 'Y', @CleanupTime = 72, @CheckSum = 'Y', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\DatabaseBackupSystemDatabasesFull.txt"
+$DatabaseBackupSystemDatabasesFull = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseBackup @Databases = 'SYSTEM_DATABASES', @Directory = '$PathBackup', @BackupType = 'FULL', @Verify = 'Y', @CleanupTime = 72, @CheckSum = 'Y', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\DatabaseBackupSystemDatabasesFull.txt"
 $DatabaseBackupSystemDatabasesFull | out-file DatabaseBackupSystemDatabasesFull.cmd -Encoding ascii
 
-$DatabaseBackupUserDatabasesFull = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseBackup @Databases = 'USER_DATABASES', @Directory = '$location', @BackupType = 'FULL', @Verify = 'Y', @CleanupTime = 72, @CheckSum = 'Y', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\DatabaseBackupUserDatabasesFull.txt"
+$DatabaseBackupUserDatabasesFull = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseBackup @Databases = 'USER_DATABASES', @Directory = '$PathBackup', @BackupType = 'FULL', @Verify = 'Y', @CleanupTime = 72, @CheckSum = 'Y', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\DatabaseBackupUserDatabasesFull.txt"
 $DatabaseBackupUserDatabasesFull | out-file DatabaseBackupUserDatabasesFull.cmd -Encoding ascii
 
-$DatabaseBackupUserDatabasesLog = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseBackup @Databases = 'USER_DATABASES', @Directory = '$location', @BackupType = 'LOG', @Verify = 'Y', @CleanupTime = 72, @CheckSum = 'Y', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\DatabaseBackupUserDatabasesLog.txt"
+$DatabaseBackupUserDatabasesLog = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseBackup @Databases = 'USER_DATABASES', @Directory = '$PathBackup', @BackupType = 'LOG', @Verify = 'Y', @CleanupTime = 72, @CheckSum = 'Y', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\DatabaseBackupUserDatabasesLog.txt"
 $DatabaseBackupUserDatabasesLog | out-file DatabaseBackupUserDatabasesLog.cmd -Encoding ascii
 
 $DatabaseIntegrityCheckSystemDatabases = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseIntegrityCheck @Databases = 'SYSTEM_DATABASES', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\DatabaseIntegrityCheckSystemDatabases.txt"
