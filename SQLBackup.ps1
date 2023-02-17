@@ -23,10 +23,13 @@ If(-Not $installed) {Write-Host $(Get-Date)"[ERROR]'$software' or SQLCmd couldn'
 $configfile = Test-Path C:\OLA\config.cfg
 if ($configfile -eq "True") {
     $username = Get-Content C:\OLA\config.cfg -TotalCount 1
-    $PathBackup = (Get-Content C:\OLA\config.cfg -TotalCount 2)[-1]
+    $deletebackupafter = (Get-Content C:\OLA\config.cfg -TotalCount 2)[-1]
+    $PathBackup = (Get-Content C:\OLA\config.cfg -TotalCount 3)[-1]
 } 
 else {
     $username = "$env:USERDomain\$env:USERNAME"
+    $deletebackupafter = "72"
+    $PathBackup = "Please Choose"
 }
 
 # GUI Window
@@ -56,6 +59,7 @@ $main.Controls.Add($Label)
 $textbox = New-Object System.Windows.Forms.TextBox
 $textbox.Location = '10,50'
 $textbox.Width += 200
+$textbox.Text = "$PathBackup"
 $main.Controls.Add($textbox)
 # Button Backuplocation
 $Button = New-Object System.Windows.Forms.Button
@@ -168,10 +172,10 @@ $Label2.Text = "Delete backup after(hours):"
 $Label2.Location  = '10,500'
 $Label2.AutoSize = $true
 $main.Controls.Add($Label2)
-#Textbox Backuplocation
+#Textbox Deletebackupafter
 $textbox2 = New-Object System.Windows.Forms.TextBox
 $textbox2.Location = '160,500'
-$textbox2.Text = "72"
+$textbox2.Text = "$deletebackupafter"
 $textbox2.Width += 150
 $main.Controls.Add($textbox2)
 
@@ -244,11 +248,12 @@ Write-Host $(Get-Date)"[WARN]The SQL Script is going to be written to C:\OLA\Scr
 #set variables from userinput
 $username = $textbox1.Text
 $deletebackupafter = $textbox2.Text
-$PathBackup = Test-Path $foldername1
-If($PathBackup -eq "True") {}
+$PathBackup = $textbox.Text
+$PathBackup2 = Test-Path $foldername1
+If($PathBackup2 -eq "True") {}
 else { mkdir $foldername1 | Out-Null}
-$PathBackup = Test-Path $foldername1
-if($PathBackup -eq "True") { Write-Host $(Get-Date)"[INFO]'$foldername1' is available"} else {Write-Host $(Get-Date)"[ERROR]'$foldername1' clould not be created. Check privilege or drive letter!" -ForegroundColor Red}
+$PathBackup2 = Test-Path $foldername1
+if($PathBackup2 -eq "True") { Write-Host $(Get-Date)"[INFO]'$foldername1' is available"} else {Write-Host $(Get-Date)"[ERROR]'$foldername1' clould not be created. Check privilege or drive letter!" -ForegroundColor Red}
 $sqldatabase = $TextboxSQLDB.Text
 $SQLLogDir = $textboxLogDir.Text
 $SQLInstanz = $textboxSQLInst.Text
@@ -262,6 +267,7 @@ Add-Content C:\OLA\config.cfg $sqldatabase
 Add-Content C:\OLA\config.cfg $SQLLogDir
 Add-Content C:\OLA\config.cfg $SQLInstanz
 Add-Content C:\OLA\config.cfg $Time
+Write-Host $(Get-Date)"[INFO]Config has been written to C:\OLA\config.cfg"
 
 #Edit MaintananceSolution.sql
 Get-Content C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql | Foreach-Object {$_.Replace('DECLARE @BackupDirectory nvarchar(max)     = NULL', "DECLARE @BackupDirectory nvarchar(max)     = '$location'")} | Set-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql
