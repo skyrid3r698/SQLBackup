@@ -10,7 +10,7 @@ If ((New-Object Security.Principal.WindowsPrincipal $IsAdmin).IsInRole([Security
     #Exit from the current, unelevated, process
     Exit
 }
-Write-Host $(Get-Date)"Start Logging:"
+Write-Host $(Get-Date)"[INFO]Start Logging:"
 Start-Transcript -Append C:\OLA\Logs\log2.txt
 
 
@@ -19,9 +19,9 @@ $software = "Microsoft Befehlszeilenprogramme 15 für SQL Server";
 $installed = $null -ne (Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object { $_.DisplayName -eq $software })
 
 If(-Not $installed) {
-	Write-Host $(Get-Date)"[ERROR]'$software' bzw. SQLCmd konnte nicht gefunden werden. Die Software ist, für ein funktionierendes Backup, zwingend notwendig. Fortfahren auf eigene Verantwortung!" -ForegroundColor Red; 
+	Write-Host $(Get-Date)"[ERROR]'$software' or SQLCmd couldn't be found. This Software is needed for this Skript to work. Continue only if you know it is installed and working!" -ForegroundColor Red; 
 } else {
-	Write-Host $(Get-Date)"[INFO]'$software' bzw. SQLcmd ist installiert."
+	Write-Host $(Get-Date)"[INFO]'$software' or SQLcmd is installed"
 }
 
 
