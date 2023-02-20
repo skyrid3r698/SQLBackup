@@ -25,11 +25,20 @@ if ($configfile -eq "True") {
     $username = Get-Content C:\OLA\config.cfg -TotalCount 1
     $deletebackupafter = (Get-Content C:\OLA\config.cfg -TotalCount 2)[-1]
     $PathBackup = (Get-Content C:\OLA\config.cfg -TotalCount 3)[-1]
+    $sqldatabase = (Get-Content C:\OLA\config.cfg -TotalCount 4)[-1]
+    $SQLLogDir = (Get-Content C:\OLA\config.cfg -TotalCount 5)[-1]
+    $SQLInstanz = (Get-Content C:\OLA\config.cfg -TotalCount 6)[-1]
+    [DateTime]$Time = (Get-Content C:\OLA\config.cfg -TotalCount 7)[-1]
 } 
 else {
     $username = "$env:USERDomain\$env:USERNAME"
     $deletebackupafter = "72"
     $PathBackup = "Please Choose"
+    $sqldatabase = "master"
+    $SQLLogDir = "C:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\Log"
+    $SQLInstanz = "SQL Instance"
+    [DateTime]$Time = "05:00"
+
 }
 
 # GUI Window
@@ -86,7 +95,7 @@ $main.Controls.Add($LabelLogDir)
 $textboxLogDir = New-Object System.Windows.Forms.TextBox
 $textboxLogDir.Location = '400,50'
 $textboxLogDir.Width += 200
-$textboxLogDir.Text = "C:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\Log"
+$textboxLogDir.Text = "$SQLLogDir"
 $main.Controls.Add($textboxLogDir)
 # Button LogDir
 $ButtonLogDir = New-Object System.Windows.Forms.Button
@@ -135,13 +144,13 @@ $main.Controls.Add($LabelSQLDB)
 $textboxSQLDB = New-Object System.Windows.Forms.TextBox
 $textboxSQLDB.Location = '10,200'
 $textboxSQLDB.Width += 100
-$TextboxSQLDB.Text = "master"
+$TextboxSQLDB.Text = "$sqldatabase"
 $main.Controls.Add($textboxSQLDB)
 
 #SQLInst
 #Label SQLInst
 $LabelSQLInst = New-Object System.Windows.Forms.Label
-$LabelSQLInst.Text = "SQL Instance"
+$LabelSQLInst.Text = "$SQLInstanz"
 $LabelSQLInst.Location  = '250,180'
 $LabelSQLInst.AutoSize = $true
 $main.Controls.Add($LabelSQLInst)
@@ -162,7 +171,7 @@ $main.Controls.Add($LabelTime)
 $textboxTime = New-Object System.Windows.Forms.TextBox
 $textboxTime.Location = '10,325'
 $textboxTime.Width += 100
-$textboxTime.Text = "05:00"
+$textboxTime.Text = [DateTime]$Time
 $main.Controls.Add($textboxTime)
 
 #Deletebackupafter
