@@ -10,8 +10,12 @@ If ((New-Object Security.Principal.WindowsPrincipal $IsAdmin).IsInRole([Security
     #Exit from the current, unelevated, process
     Exit
 }
+$InstallPath = "C:\OLA\Instance1"
+Start-Transcript -Append $InstallPath\log1.txt
 Write-Host $(Get-Date)"[INFO]Start Logging:"
-Start-Transcript -Append C:\OLA\Logs\log2.txt
+
+Write-Host $(Get-Date)"[INFO]Install path:"$InstallPath
+
 
 #Check if sqlcmd is installed
 $software = "Microsoft Befehlszeilenprogramme 15 für SQL Server";
@@ -20,15 +24,15 @@ $installed = $null -ne (Get-ItemProperty HKLM:\Software\Microsoft\Windows\Curren
 If(-Not $installed) {Write-Host $(Get-Date)"[ERROR]'$software' or SQLCmd couldn't be found. This Software is needed for this Skript to work. Continue only if you know it is installed and working!" -ForegroundColor Red;} else {Write-Host $(Get-Date)"[INFO]'$software' or SQLcmd is installed"}
 
 #Read Config if available
-$configfile = Test-Path C:\OLA\config.cfg
+$configfile = Test-Path $InstallPath\config.cfg
 if ($configfile -eq "True") {
-    $username = Get-Content C:\OLA\config.cfg -TotalCount 1
-    $deletebackupafter = (Get-Content C:\OLA\config.cfg -TotalCount 2)[-1]
-    $PathBackup = (Get-Content C:\OLA\config.cfg -TotalCount 3)[-1]
-    $sqldatabase = (Get-Content C:\OLA\config.cfg -TotalCount 4)[-1]
-    $SQLLogDir = (Get-Content C:\OLA\config.cfg -TotalCount 5)[-1]
-    $SQLInstanz = (Get-Content C:\OLA\config.cfg -TotalCount 6)[-1]
-    $Time = (Get-Content C:\OLA\config.cfg -TotalCount 7)[-1]
+    $username = Get-Content $InstallPath\config.cfg -TotalCount 1
+    $deletebackupafter = (Get-Content $InstallPath\config.cfg -TotalCount 2)[-1]
+    $PathBackup = (Get-Content $InstallPath\config.cfg -TotalCount 3)[-1]
+    $sqldatabase = (Get-Content $InstallPath\config.cfg -TotalCount 4)[-1]
+    $SQLLogDir = (Get-Content $InstallPath\config.cfg -TotalCount 5)[-1]
+    $SQLInstanz = (Get-Content $InstallPath\config.cfg -TotalCount 6)[-1]
+    $Time = (Get-Content $InstallPath\config.cfg -TotalCount 7)[-1]
 } 
 else {
     $username = "$env:USERDomain\$env:USERNAME"
@@ -191,7 +195,7 @@ $main.Controls.Add($textbox2)
 
 #Label Info
 $LabelInfo = New-Object System.Windows.Forms.Label
-$LabelInfo.Text = "[i]Scripts and Logs will be written to C:\OLA\"
+$LabelInfo.Text = "[i]Scripts and Logs will be written to $InstallPath"
 $LabelInfo.Location  = '5,550'
 $LabelInfo.AutoSize = $true
 #$LabelInfo.Font = New-Object System.Drawing.Font("Arial",12,[System.Drawing.FontStyle]::Bold)
@@ -200,7 +204,7 @@ $main.Controls.Add($LabelInfo)
 #Label Info2
 if ($configfile -eq "True") {
     $LabelInfo2 = New-Object System.Windows.Forms.Label
-    $LabelInfo2.Text = "[i]Config has been read from C:\OLA\config.cfg"
+    $LabelInfo2.Text = "[i]Config has been read from $InstallPath\config.cfg"
     $LabelInfo2.Location  = '5,570'
     $LabelInfo2.AutoSize = $true
     #$LabelInfo2.Font = New-Object System.Drawing.Font("Arial",12,[System.Drawing.FontStyle]::Bold)
@@ -237,23 +241,23 @@ else {
 }
 
 #Download SQL Script + Create paths
-$PathScripts = Test-Path C:\OLA\Scripts\
-$PathLogs = Test-Path C:\OLA\Logs\
-If($PathScripts -eq "True") {} else {mkdir C:\OLA\Scripts\ | Out-Null}
-If($PathLogs -eq "True") {} else {mkdir C:\OLA\Logs\ | Out-Null}
+$PathScripts = Test-Path $InstallPath\Scripts\
+$PathLogs = Test-Path $InstallPath\Logs\
+If($PathScripts -eq "True") {} else {mkdir $InstallPath\Scripts\ | Out-Null}
+If($PathLogs -eq "True") {} else {mkdir $InstallPath\Logs\ | Out-Null}
 Invoke-WebRequest -Uri https://ola.hallengren.com/scripts/MaintenanceSolution.sql -OutFile C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql
 # Check if paths are created
-$PathScripts = Test-Path C:\OLA\Scripts\
-$PathLogs = Test-Path C:\OLA\Logs\
-if($PathScripts -eq "True") { Write-Host $(Get-Date)"[INFO]C:\OLA\Scripts is available"} else {Write-Host $(Get-Date)"[ERROR]C:\OLA\Scripts clould not be created. Check privilege or drive letter!" -ForegroundColor Red}
-if($PathLogs -eq "True") { Write-Host $(Get-Date)"[INFO]C:\OLA\Logs is available"} else {Write-Host $(Get-Date)"[ERROR]C:\OLA\Scripts clould not be created. Check privilege or drive letter" -ForegroundColor Red}
+$PathScripts = Test-Path $InstallPath\Scripts\
+$PathLogs = Test-Path $InstallPath\Logs\
+if($PathScripts -eq "True") { Write-Host $(Get-Date)"[INFO]$InstallPath\Scripts is available"} else {Write-Host $(Get-Date)"[ERROR]$InstallPath\Scripts clould not be created. Check privilege or drive letter!" -ForegroundColor Red}
+if($PathLogs -eq "True") { Write-Host $(Get-Date)"[INFO]$InstallPath\Logs is available"} else {Write-Host $(Get-Date)"[ERROR]$InstallPath\Scripts clould not be created. Check privilege or drive letter" -ForegroundColor Red}
 
 # Check if the file has been downloaded
 $PathSQLScript = Test-Path C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql
 if($PathSQLScript -eq "True") { Write-Host $(Get-Date)"[INFO]MaintananceSolution.sql successfully downloaded to" C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql} else {Write-Host $(Get-Date)"[ERROR]MaintanenceSolution.sql could not be downloaded. Check your internet connection!" -ForegroundColor Red}
 
 #Log Message
-Write-Host $(Get-Date)"[WARN]The SQL Script is going to be written to C:\OLA\Scripts\MaintananceSolutionEdited.sql and has to be run manually after creation" -ForegroundColor Yellow
+Write-Host $(Get-Date)"[WARN]The SQL Script is going to be written to $InstallPath\Scripts\MaintananceSolutionEdited.sql and has to be run manually after creation" -ForegroundColor Yellow
 
 #set variables from userinput
 $username = $textbox1.Text
@@ -270,161 +274,162 @@ $SQLInstanz = $textboxSQLInst.Text
 $Time = $textboxTime.Text
 
 #Write configfile
-Out-File C:\OLA\config.cfg -Encoding ascii -InputObject $username
-Add-Content C:\OLA\config.cfg $deletebackupafter
-Add-Content C:\OLA\config.cfg $PathBackup
-Add-Content C:\OLA\config.cfg $sqldatabase
-Add-Content C:\OLA\config.cfg $SQLLogDir
-Add-Content C:\OLA\config.cfg $SQLInstanz
-Add-Content C:\OLA\config.cfg $Time
-Write-Host $(Get-Date)"[INFO]Config has been written to C:\OLA\config.cfg"
+Out-File $InstallPath\config.cfg -Encoding ascii -InputObject $username
+Add-Content $InstallPath\config.cfg $deletebackupafter
+Add-Content $InstallPath\config.cfg $PathBackup
+Add-Content $InstallPath\config.cfg $sqldatabase
+Add-Content $InstallPath\config.cfg $SQLLogDir
+Add-Content $InstallPath\config.cfg $SQLInstanz
+Add-Content $InstallPath\config.cfg $Time
+Write-Host $(Get-Date)"[INFO]Config has been written to $InstallPath\config.cfg"
 
 #Edit MaintananceSolution.sql
 Get-Content C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql | Foreach-Object {$_.Replace('DECLARE @BackupDirectory nvarchar(max)     = NULL', "DECLARE @BackupDirectory nvarchar(max)     = '$PathBackup'")} | Set-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql
-Get-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql | Foreach-Object {$_.Replace('DECLARE @CleanupTime int                   = NULL', "DECLARE @CleanupTime int                   = $deletebackupafter")} | Set-Content C:\OLA\Scripts\MaintananceSolutionEdited.sql
+Get-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql | Foreach-Object {$_.Replace('DECLARE @CleanupTime int                   = NULL', "DECLARE @CleanupTime int                   = $deletebackupafter")} | Set-Content $InstallPath\Scripts\MaintananceSolutionEdited.sql
 
 #Edit and create Scripts
-Set-Location C:\OLA\Scripts\
-$CommandLogCleanup = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""DELETE FROM dbo.CommandLog WHERE StartTime < DATEADD(dd, -30, GETDATE());"" -b -o C:\OLA\Logs\CommandLogCleanup.txt"
+Set-Location $InstallPath\Scripts\
+$CommandLogCleanup = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""DELETE FROM dbo.CommandLog WHERE StartTime < DATEADD(dd, -30, GETDATE());"" -b -o $InstallPath\Logs\CommandLogCleanup.txt"
 $CommandLogCleanup | out-file CommandLogCleanup.cmd -Encoding ascii
 
 $OutFileCleanup = @"
 @echo off
 set _SQLLOGDIR_=$SQLLogDir
-set _LOGFILE_=C:\OLA\Logs\OutputFileCleanup.txt
+set _LOGFILE_=$InstallPath\Logs\OutputFileCleanup.txt
 if exist %_LOGFILE_% del %_LOGFILE_% > nul:
 cmd /q /c "For /F "tokens=1 delims=" %%v In ('ForFiles /P "%_SQLLOGDIR_%" /m *_*_*_*.txt /d -30 2^>^&1') do if EXIST "%_SQLLOGDIR_%"\%%v echo del "%_SQLLOGDIR_%"\%%v& del "%_SQLLOGDIR_%"\%%v" >> %_LOGFILE_%
 "@
 $OutFileCleanup | out-file OutFileCleanup.cmd -Encoding ascii
 
-$DeleteBackupHistory = "sqlcmd -E -S $SQLInstanz -d msdb -Q ""DECLARE @CleanupDate datetime; SET @CleanupDate = DATEADD(dd, -30, GETDATE()); EXECUTE dbo.sp_delete_backuphistory @oldest_date = @CleanupDate;"" -b -o C:\OLA\Logs\DeleteBackupHistory.txt"
+$DeleteBackupHistory = "sqlcmd -E -S $SQLInstanz -d msdb -Q ""DECLARE @CleanupDate datetime; SET @CleanupDate = DATEADD(dd, -30, GETDATE()); EXECUTE dbo.sp_delete_backuphistory @oldest_date = @CleanupDate;"" -b -o $InstallPath\Logs\DeleteBackupHistory.txt"
 $DeleteBackupHistory | out-file DeleteBackupHistory.cmd -Encoding ascii
 
-$PurgeJobHistory = "sqlcmd -E -S $SQLInstanz -d msdb -Q ""DECLARE @CleanupDate datetime; SET @CleanupDate = DATEADD(dd, -30, GETDATE()); EXECUTE dbo.sp_purge_jobhistory @oldest_date = @CleanupDate;"" -b -o C:\OLA\Logs\PurgeJobHistory.txt"
+$PurgeJobHistory = "sqlcmd -E -S $SQLInstanz -d msdb -Q ""DECLARE @CleanupDate datetime; SET @CleanupDate = DATEADD(dd, -30, GETDATE()); EXECUTE dbo.sp_purge_jobhistory @oldest_date = @CleanupDate;"" -b -o $InstallPath\Logs\PurgeJobHistory.txt"
 $PurgeJobHistory | out-file PurgeJobHistory.cmd -Encoding ascii
 
-$DatabaseBackupSystemDatabasesFull = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseBackup @Databases = 'SYSTEM_DATABASES', @Directory = '$PathBackup', @BackupType = 'FULL', @Verify = 'Y', @CleanupTime = 72, @CheckSum = 'Y', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\DatabaseBackupSystemDatabasesFull.txt"
+$DatabaseBackupSystemDatabasesFull = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseBackup @Databases = 'SYSTEM_DATABASES', @Directory = '$PathBackup', @BackupType = 'FULL', @Verify = 'Y', @CleanupTime = 72, @CheckSum = 'Y', @LogToTable = 'Y';"" -b -o $InstallPath\Logs\DatabaseBackupSystemDatabasesFull.txt"
 $DatabaseBackupSystemDatabasesFull | out-file DatabaseBackupSystemDatabasesFull.cmd -Encoding ascii
 
-$DatabaseBackupUserDatabasesFull = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseBackup @Databases = 'USER_DATABASES', @Directory = '$PathBackup', @BackupType = 'FULL', @Verify = 'Y', @CleanupTime = 72, @CheckSum = 'Y', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\DatabaseBackupUserDatabasesFull.txt"
+$DatabaseBackupUserDatabasesFull = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseBackup @Databases = 'USER_DATABASES', @Directory = '$PathBackup', @BackupType = 'FULL', @Verify = 'Y', @CleanupTime = 72, @CheckSum = 'Y', @LogToTable = 'Y';"" -b -o $InstallPath\Logs\DatabaseBackupUserDatabasesFull.txt"
 $DatabaseBackupUserDatabasesFull | out-file DatabaseBackupUserDatabasesFull.cmd -Encoding ascii
 
-$DatabaseBackupUserDatabasesLog = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseBackup @Databases = 'USER_DATABASES', @Directory = '$PathBackup', @BackupType = 'LOG', @Verify = 'Y', @CleanupTime = 72, @CheckSum = 'Y', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\DatabaseBackupUserDatabasesLog.txt"
+$DatabaseBackupUserDatabasesLog = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseBackup @Databases = 'USER_DATABASES', @Directory = '$PathBackup', @BackupType = 'LOG', @Verify = 'Y', @CleanupTime = 72, @CheckSum = 'Y', @LogToTable = 'Y';"" -b -o $InstallPath\Logs\DatabaseBackupUserDatabasesLog.txt"
 $DatabaseBackupUserDatabasesLog | out-file DatabaseBackupUserDatabasesLog.cmd -Encoding ascii
 
-$DatabaseIntegrityCheckSystemDatabases = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseIntegrityCheck @Databases = 'SYSTEM_DATABASES', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\DatabaseIntegrityCheckSystemDatabases.txt"
+$DatabaseIntegrityCheckSystemDatabases = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseIntegrityCheck @Databases = 'SYSTEM_DATABASES', @LogToTable = 'Y';"" -b -o $InstallPath\Logs\DatabaseIntegrityCheckSystemDatabases.txt"
 $DatabaseIntegrityCheckSystemDatabases | out-file DatabaseIntegrityCheckSystemDatabases.cmd -Encoding ascii
 
-$DatabaseIntegrityCheckUserDatabases = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseIntegrityCheck @Databases = 'USER_DATABASES', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\DatabaseIntegrityCheckUserDatabases.txt"
+$DatabaseIntegrityCheckUserDatabases = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.DatabaseIntegrityCheck @Databases = 'USER_DATABASES', @LogToTable = 'Y';"" -b -o $InstallPath\Logs\DatabaseIntegrityCheckUserDatabases.txt"
 $DatabaseIntegrityCheckUserDatabases | out-file DatabaseIntegrityCheckUserDatabases.cmd -Encoding ascii
 
-$IndexOptimizeSystemDatabases = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.IndexOptimize @Databases = 'master,msdb', @MSShippedObjects = 'Y', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\IndexOptimizeSystemDatabases.txt"
+$IndexOptimizeSystemDatabases = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.IndexOptimize @Databases = 'master,msdb', @MSShippedObjects = 'Y', @LogToTable = 'Y';"" -b -o $InstallPath\Logs\IndexOptimizeSystemDatabases.txt"
 $IndexOptimizeSystemDatabases | out-file IndexOptimizeSystemDatabases.cmd -Encoding ascii
 
-$IndexOptimizeUserDatabases = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.IndexOptimize @Databases = 'USER_DATABASES', @LogToTable = 'Y';"" -b -o C:\OLA\Logs\IndexOptimizeUserDatabases.txt"
+$IndexOptimizeUserDatabases = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""EXECUTE dbo.IndexOptimize @Databases = 'USER_DATABASES', @LogToTable = 'Y';"" -b -o $InstallPath\Logs\IndexOptimizeUserDatabases.txt"
 $IndexOptimizeUserDatabases | out-file IndexOptimizeUserDatabases.cmd -Encoding ascii
 
-$Monitoring = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""SELECT cl.ID, cl.DatabaseName, cl.CommandType, cl.StartTime, cl.EndTime, cl.ErrorNumber FROM master.dbo.CommandLog AS cl WHERE (cl.ErrorNumber <> 0) ORDER BY cl.ID DESC;"" -b -o C:\OLA\Logs\monitoring.txt"
+$Monitoring = "sqlcmd -E -S $SQLInstanz -d $sqldatabase -Q ""SELECT cl.ID, cl.DatabaseName, cl.CommandType, cl.StartTime, cl.EndTime, cl.ErrorNumber FROM master.dbo.CommandLog AS cl WHERE (cl.ErrorNumber <> 0) ORDER BY cl.ID DESC;"" -b -o $InstallPath\Logs\monitoring.txt"
 $Monitoring | out-file Monitoring.cmd -Encoding ascii
 
 ##Create MS Tasks
 #IndexOptimizeSystemDatabases
 $Time = [DateTime]$Time
-[string]$TaskName = "Index Optimization - System Databases"
+$PathName = $InstallPath -creplace '(?s)^.*\\', ''
+[string]$TaskName = "Index Optimization - System Databases_$PathName"
 [string]$TaskBeschrieb = "Diese Aufgabe Optimiert den Index der master und msdb"
-[string]$TaskPfad = "\OLA - SQL Mantenance Tasks"
+[string]$TaskPfad = "\OLA - SQL Mantenance Tasks - $PathName"
 $TaskAusloeser = New-ScheduledTaskTrigger -Daily -DaysInterval 1 -At ($Time).tostring("HH:mm")
-$TaskAktion = New-ScheduledTaskAction -Execute "C:\OLA\Scripts\IndexOptimizeSystemDatabases.cmd"
+$TaskAktion = New-ScheduledTaskAction -Execute "$InstallPath\Scripts\IndexOptimizeSystemDatabases.cmd"
 $TaskBenutzer = New-ScheduledTaskPrincipal -UserId "$username" -RunLevel Highest
 if (Get-ScheduledTask $TaskName -ErrorAction SilentlyContinue) {Unregister-ScheduledTask $TaskName}
 Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPfad -Action $TaskAktion -Trigger $TaskAusloeser -Principal $TaskBenutzer -Description $TaskBeschrieb
 
 $Time = ($Time).AddMinutes(05)
 #IndexOptimizeUserDatabases
-[string]$TaskName = "Index Optimization - User Databases"
+[string]$TaskName = "Index Optimization - User Databases_$PathName"
 [string]$TaskBeschrieb = "Diese Aufgabe Optimiert den Index der Benutzerdatenbanken"
 $TaskAusloeser = New-ScheduledTaskTrigger -Daily -DaysInterval 1 -At ($Time).tostring("HH:mm")
-$TaskAktion = New-ScheduledTaskAction -Execute "C:\OLA\Scripts\IndexOptimizeUserDatabases.cmd"
+$TaskAktion = New-ScheduledTaskAction -Execute "$InstallPath\Scripts\IndexOptimizeUserDatabases.cmd"
 if (Get-ScheduledTask $TaskName -ErrorAction SilentlyContinue) {Unregister-ScheduledTask $TaskName}
 Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPfad -Action $TaskAktion -Trigger $TaskAusloeser -Principal $TaskBenutzer -Description $TaskBeschrieb
 
 $Time = ($Time).AddMinutes(05)
 #DatabaseIntegrityCheckSystemDatabases
-[string]$TaskName = "Database Integrity Check - System Databases"
+[string]$TaskName = "Database Integrity Check - System Databases_$PathName"
 [string]$TaskBeschrieb = "Database Integrity Check - System Databases"
 $TaskAusloeser = New-ScheduledTaskTrigger -Daily -DaysInterval 1 -At ($Time).tostring("HH:mm")
-$TaskAktion = New-ScheduledTaskAction -Execute "C:\OLA\Scripts\DatabaseIntegrityCheckSystemDatabases.cmd"
+$TaskAktion = New-ScheduledTaskAction -Execute "$InstallPath\Scripts\DatabaseIntegrityCheckSystemDatabases.cmd"
 if (Get-ScheduledTask $TaskName -ErrorAction SilentlyContinue) {Unregister-ScheduledTask $TaskName}
 Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPfad -Action $TaskAktion -Trigger $TaskAusloeser -Principal $TaskBenutzer -Description $TaskBeschrieb
 
 $Time = ($Time).AddMinutes(05)
 #DatabaseIntegrityCheckUserDatabases
-[string]$TaskName = "Database Integrity Check - User Databases"
+[string]$TaskName = "Database Integrity Check - User Databases_$PathName"
 [string]$TaskBeschrieb = "Database Integrity Check - User Databases"
 $TaskAusloeser = New-ScheduledTaskTrigger -Daily -DaysInterval 1 -At ($Time).tostring("HH:mm")
-$TaskAktion = New-ScheduledTaskAction -Execute "C:\OLA\Scripts\DatabaseIntegrityCheckUserDatabases.cmd"
+$TaskAktion = New-ScheduledTaskAction -Execute "$InstallPath\Scripts\DatabaseIntegrityCheckUserDatabases.cmd"
 if (Get-ScheduledTask $TaskName -ErrorAction SilentlyContinue) {Unregister-ScheduledTask $TaskName}
 Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPfad -Action $TaskAktion -Trigger $TaskAusloeser -Principal $TaskBenutzer -Description $TaskBeschrieb
 
 $Time = ($Time).AddMinutes(30)
 #Command Log Cleanup
-[string]$TaskName = "Command Log Cleanup"
+[string]$TaskName = "Command Log Cleanup_$PathName"
 [string]$TaskBeschrieb = "Diese Aufgabe löscht Logs älter als 30 Tage"
 $TaskAusloeser = New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek Sunday -At ($Time).tostring("HH:mm")
-$TaskAktion = New-ScheduledTaskAction -Execute "C:\OLA\Scripts\CommandLogCleanup.cmd"
+$TaskAktion = New-ScheduledTaskAction -Execute "$InstallPath\Scripts\CommandLogCleanup.cmd"
 if (Get-ScheduledTask $TaskName -ErrorAction SilentlyContinue) {Unregister-ScheduledTask $TaskName}
 Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPfad -Action $TaskAktion -Trigger $TaskAusloeser -Principal $TaskBenutzer -Description $TaskBeschrieb
 
 $Time = ($Time).AddMinutes(05)
 #Output File Cleanup
-[string]$TaskName = "Output File Cleanup"
+[string]$TaskName = "Output File Cleanup_$PathName"
 [string]$TaskBeschrieb = "Diese Aufgabe löscht dateien mit dem Namen *_*_*_*.txt aus dem angegebenen SQL Log Verzeichnis"
 $TaskAusloeser = New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek Sunday -At ($Time).tostring("HH:mm")
-$TaskAktion = New-ScheduledTaskAction -Execute "C:\OLA\Scripts\OutFileCleanup.cmd"
+$TaskAktion = New-ScheduledTaskAction -Execute "$InstallPath\Scripts\OutFileCleanup.cmd"
 if (Get-ScheduledTask $TaskName -ErrorAction SilentlyContinue) {Unregister-ScheduledTask $TaskName}
 Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPfad -Action $TaskAktion -Trigger $TaskAusloeser -Principal $TaskBenutzer -Description $TaskBeschrieb
 
 $Time = ($Time).AddMinutes(05)
 #DeleteBackupHistory
-[string]$TaskName = "Delete Backup History"
+[string]$TaskName = "Delete Backup History_$PathName"
 [string]$TaskBeschrieb = "Diese Aufgabe löscht backup history records, welche älter als 30 Tage sind"
 $TaskAusloeser = New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek Sunday -At ($Time).tostring("HH:mm")
-$TaskAktion = New-ScheduledTaskAction -Execute "C:\OLA\Scripts\DeleteBackupHistory.cmd"
+$TaskAktion = New-ScheduledTaskAction -Execute "$InstallPath\Scripts\DeleteBackupHistory.cmd"
 if (Get-ScheduledTask $TaskName -ErrorAction SilentlyContinue) {Unregister-ScheduledTask $TaskName}
 Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPfad -Action $TaskAktion -Trigger $TaskAusloeser -Principal $TaskBenutzer -Description $TaskBeschrieb
 
 $Time = ($Time).AddMinutes(05)
 #PurgeJobHistory
-[string]$TaskName = "Purge Job History"
+[string]$TaskName = "Purge Job History_$PathName"
 [string]$TaskBeschrieb = "Diese Aufgabe löscht SQL Server Agenten Jobs älter als 30 Tage (Nicht relevant für SQL Express)"
 $TaskAusloeser = New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek Sunday -At ($Time).tostring("HH:mm")
-$TaskAktion = New-ScheduledTaskAction -Execute "C:\OLA\Scripts\PurgeJobHistory.cmd"
+$TaskAktion = New-ScheduledTaskAction -Execute "$InstallPath\Scripts\PurgeJobHistory.cmd"
 if (Get-ScheduledTask $TaskName -ErrorAction SilentlyContinue) {Unregister-ScheduledTask $TaskName}
 Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPfad -Action $TaskAktion -Trigger $TaskAusloeser -Principal $TaskBenutzer -Description $TaskBeschrieb
 
 $Time = ($Time).AddMinutes(05)
 #DatabaseBackupSystemDatabasesFull
-[string]$TaskName = "Database Backup - System Databases Full"
+[string]$TaskName = "Database Backup - System Databases Full_$PathName"
 [string]$TaskBeschrieb = "Diese Aufgabe sichert alle Systemdatenbanken komplett"
 $TaskAusloeser = New-ScheduledTaskTrigger -Daily -DaysInterval 1 -At ($Time).tostring("HH:mm")
-$TaskAktion = New-ScheduledTaskAction -Execute "C:\OLA\Scripts\DatabaseBackupSystemDatabasesFull.cmd"
+$TaskAktion = New-ScheduledTaskAction -Execute "$InstallPath\Scripts\DatabaseBackupSystemDatabasesFull.cmd"
 if (Get-ScheduledTask $TaskName -ErrorAction SilentlyContinue) {Unregister-ScheduledTask $TaskName}
 Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPfad -Action $TaskAktion -Trigger $TaskAusloeser -Principal $TaskBenutzer -Description $TaskBeschrieb
 
 $Time = ($Time).AddMinutes(05)
 #DatabaseBackupUserDatabasesFull
-[string]$TaskName = "Database Backup - User Databases Full"
+[string]$TaskName = "Database Backup - User Databases Full_$PathName"
 [string]$TaskBeschrieb = "Diese Aufgabe sichert alle Userdatenbanken komplett"
 $TaskAusloeser = New-ScheduledTaskTrigger -Daily -DaysInterval 1 -At ($Time).tostring("HH:mm") 
-$TaskAktion = New-ScheduledTaskAction -Execute "C:\OLA\Scripts\DatabaseBackupUserDatabasesFull.cmd"
+$TaskAktion = New-ScheduledTaskAction -Execute "$InstallPath\Scripts\DatabaseBackupUserDatabasesFull.cmd"
 if (Get-ScheduledTask $TaskName -ErrorAction SilentlyContinue) {Unregister-ScheduledTask $TaskName}
 Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPfad -Action $TaskAktion -Trigger $TaskAusloeser -Principal $TaskBenutzer -Description $TaskBeschrieb
 
 $Time = ($Time).AddMinutes(05)
 #DatabaseBackupUserDatabasesLog
-[string]$TaskName = "Database Backup - User Databases Log"
+[string]$TaskName = "Database Backup - User Databases Log_$PathName"
 [string]$TaskBeschrieb = "Diese Aufgabe sichert alle Userdatenbanken Transaktionssicherung mit dem Full recovery model"
 $TaskAusloeser = New-ScheduledTaskTrigger -Once -At ($Time).tostring("HH:mm") -RepetitionInterval  (New-TimeSpan -Minutes 30)
-$TaskAktion = New-ScheduledTaskAction -Execute "C:\OLA\Scripts\DatabaseBackupUserDatabasesLog.cmd"
+$TaskAktion = New-ScheduledTaskAction -Execute "$InstallPath\Scripts\DatabaseBackupUserDatabasesLog.cmd"
 if (Get-ScheduledTask $TaskName -ErrorAction SilentlyContinue) {Unregister-ScheduledTask $TaskName}
 Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPfad -Action $TaskAktion -Trigger $TaskAusloeser -Principal $TaskBenutzer -Description $TaskBeschrieb
