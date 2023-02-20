@@ -28,7 +28,7 @@ if ($configfile -eq "True") {
     $sqldatabase = (Get-Content C:\OLA\config.cfg -TotalCount 4)[-1]
     $SQLLogDir = (Get-Content C:\OLA\config.cfg -TotalCount 5)[-1]
     $SQLInstanz = (Get-Content C:\OLA\config.cfg -TotalCount 6)[-1]
-    [DateTime]$Time = (Get-Content C:\OLA\config.cfg -TotalCount 7)[-1]
+    $Time.substring(10) = (Get-Content C:\OLA\config.cfg -TotalCount 7)[-1]
 } 
 else {
     $username = "$env:USERDomain\$env:USERNAME"
@@ -150,13 +150,14 @@ $main.Controls.Add($textboxSQLDB)
 #SQLInst
 #Label SQLInst
 $LabelSQLInst = New-Object System.Windows.Forms.Label
-$LabelSQLInst.Text = "$SQLInstanz"
+$LabelSQLInst.Text = "SQL Instance"
 $LabelSQLInst.Location  = '250,180'
 $LabelSQLInst.AutoSize = $true
 $main.Controls.Add($LabelSQLInst)
 #Textbox SQLDB
 $textboxSQLInst = New-Object System.Windows.Forms.TextBox
 $textboxSQLInst.Location = '250,200'
+$textboxSQLInst.Text = "$SQLInstanz"
 $textboxSQLInst.Width += 200
 $main.Controls.Add($textboxSQLInst)
 
@@ -171,7 +172,7 @@ $main.Controls.Add($LabelTime)
 $textboxTime = New-Object System.Windows.Forms.TextBox
 $textboxTime.Location = '10,325'
 $textboxTime.Width += 100
-$textboxTime.Text = [DateTime]$Time
+$textboxTime.Text = $Time
 $main.Controls.Add($textboxTime)
 
 #Deletebackupafter
