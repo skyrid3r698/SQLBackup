@@ -249,11 +249,11 @@ Write-Host $(Get-Date)"[WARN]The SQL Script is going to be written to C:\OLA\Scr
 $username = $textbox1.Text
 $deletebackupafter = $textbox2.Text
 $PathBackup = $textbox.Text
-$PathBackup2 = Test-Path $foldername1
+$PathBackup2 = Test-Path $textbox.Text
 If($PathBackup2 -eq "True") {}
-else { mkdir $foldername1 | Out-Null}
-$PathBackup2 = Test-Path $foldername1
-if($PathBackup2 -eq "True") { Write-Host $(Get-Date)"[INFO]'$foldername1' is available"} else {Write-Host $(Get-Date)"[ERROR]'$foldername1' clould not be created. Check privilege or drive letter!" -ForegroundColor Red}
+else { mkdir $textbox.Text | Out-Null}
+$PathBackup2 = Test-Path $textbox.Text
+if($PathBackup2 -eq "True") { Write-Host $(Get-Date)"[INFO]"$textbox.Text" is available"} else {Write-Host $(Get-Date)"[ERROR]"$textbox.Text" clould not be created. Check privilege or drive letter!" -ForegroundColor Red}
 $sqldatabase = $TextboxSQLDB.Text
 $SQLLogDir = $textboxLogDir.Text
 $SQLInstanz = $textboxSQLInst.Text
