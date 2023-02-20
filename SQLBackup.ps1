@@ -28,7 +28,7 @@ if ($configfile -eq "True") {
     $sqldatabase = (Get-Content C:\OLA\config.cfg -TotalCount 4)[-1]
     $SQLLogDir = (Get-Content C:\OLA\config.cfg -TotalCount 5)[-1]
     $SQLInstanz = (Get-Content C:\OLA\config.cfg -TotalCount 6)[-1]
-    $Time.substring(10) = (Get-Content C:\OLA\config.cfg -TotalCount 7)[-1]
+    $Time = (Get-Content C:\OLA\config.cfg -TotalCount 7)[-1]
 } 
 else {
     $username = "$env:USERDomain\$env:USERNAME"
@@ -37,7 +37,7 @@ else {
     $sqldatabase = "master"
     $SQLLogDir = "C:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\Log"
     $SQLInstanz = "SQL Instance"
-    [DateTime]$Time = "05:00"
+    $Time = "05:00"
 
 }
 
@@ -267,7 +267,7 @@ if($PathBackup2 -eq "True") { Write-Host $(Get-Date)"[INFO]"$textbox.Text" is av
 $sqldatabase = $TextboxSQLDB.Text
 $SQLLogDir = $textboxLogDir.Text
 $SQLInstanz = $textboxSQLInst.Text
-[DateTime]$Time = $textboxTime.Text
+$Time = $textboxTime.Text
 
 #Write configfile
 Out-File C:\OLA\config.cfg -Encoding ascii -InputObject $username
@@ -329,6 +329,7 @@ $Monitoring | out-file Monitoring.cmd -Encoding ascii
 
 ##Create MS Tasks
 #IndexOptimizeSystemDatabases
+$Time = [DateTime]$Time
 [string]$TaskName = "Index Optimization - System Databases"
 [string]$TaskBeschrieb = "Diese Aufgabe Optimiert den Index der master und msdb"
 [string]$TaskPfad = "\OLA - SQL Mantenance Tasks"
