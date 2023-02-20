@@ -165,6 +165,14 @@ $textboxSQLInst.Text = "$SQLInstanz"
 $textboxSQLInst.Width += 200
 $main.Controls.Add($textboxSQLInst)
 
+#Label TitleTime
+$LabelTitleTime = New-Object System.Windows.Forms.Label
+$LabelTitleTime.Text = "Time"
+$LabelTitleTime.Location  = '5,250'
+$LabelTitleTime.AutoSize = $true
+$LabelTitleTime.Font = New-Object System.Drawing.Font("Arial",12,[System.Drawing.FontStyle]::Bold)
+$main.Controls.Add($LabelTitleTime)
+
 #Time
 #Label Time
 $LabelTime = New-Object System.Windows.Forms.Label
