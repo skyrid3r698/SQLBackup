@@ -11,7 +11,7 @@ If ((New-Object Security.Principal.WindowsPrincipal $IsAdmin).IsInRole([Security
     Exit
 }
 $InstallPath = "C:\OLA\Instance1"
-Start-Transcript -Append $InstallPath\log1.txt
+Start-Transcript -Append $InstallPath\log.txt
 Write-Host $(Get-Date)"[INFO]Start Logging:"
 
 Write-Host $(Get-Date)"[INFO]Install path:"$InstallPath
@@ -165,6 +165,14 @@ $textboxSQLInst.Text = "$SQLInstanz"
 $textboxSQLInst.Width += 200
 $main.Controls.Add($textboxSQLInst)
 
+#checkSQLSkript
+$checkSQLSkript = new-object System.Windows.Forms.checkbox
+$checkSQLSkript.Location = '600,195'
+$checkSQLSkript.Size = '250,30'
+$checkSQLSkript.Text = "Run SQL-Skript on specified database automatically"
+$checkSQLSkript.Checked = $false
+$main.Controls.Add($checkSQLSkript) 
+
 #Label TitleTime
 $LabelTitleTime = New-Object System.Windows.Forms.Label
 $LabelTitleTime.Text = "Time"
@@ -280,6 +288,7 @@ $sqldatabase = $TextboxSQLDB.Text
 $SQLLogDir = $textboxLogDir.Text
 $SQLInstanz = $textboxSQLInst.Text
 $Time = $textboxTime.Text
+$runsql = $checkSQLSkript.Checked
 
 #Write configfile
 Out-File $InstallPath\config.cfg -Encoding ascii -InputObject $username
@@ -294,6 +303,12 @@ Write-Host $(Get-Date)"[INFO]Config has been written to $InstallPath\config.cfg"
 #Edit MaintananceSolution.sql
 Get-Content C:\Users\$env:USERNAME\Downloads\MaintananceSolution.sql | Foreach-Object {$_.Replace('DECLARE @BackupDirectory nvarchar(max)     = NULL', "DECLARE @BackupDirectory nvarchar(max)     = '$PathBackup'")} | Set-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql
 Get-Content C:\Users\$env:USERNAME\AppData\Local\Temp\result.sql | Foreach-Object {$_.Replace('DECLARE @CleanupTime int                   = NULL', "DECLARE @CleanupTime int                   = $deletebackupafter")} | Set-Content $InstallPath\Scripts\MaintananceSolutionEdited.sql
+
+#run edited MaintananceSolution.sql on specified instance
+if ($runsql -eq $true){
+    sqlcmd -S $SQLInstanz -i $InstallPath\Scripts\MaintananceSolutionEdited.sql
+    Write-Host $(Get-Date)"[INFO]Edited SQL-Skript has been run on $SQLInstanz check Log under $InstallPath\log.txt if run correctly"
+}
 
 #Edit and create Scripts
 Set-Location $InstallPath\Scripts\
