@@ -77,7 +77,7 @@ $main.Controls.Add($textbox)
 # Button Backuplocation
 $Button = New-Object System.Windows.Forms.Button
 $Button.Location = '310,50'
-$Button.Size = New-Object System.Drawing.Size(30,23)
+$Button.Size = New-Object System.Drawing.Size(30,20)
 $Button.Text = "..."
 $Button.Add_Click({
     $browse = New-Object system.windows.forms.FolderBrowserDialog
@@ -98,13 +98,13 @@ $main.Controls.Add($LabelLogDir)
 # Textbox LogDir
 $textboxLogDir = New-Object System.Windows.Forms.TextBox
 $textboxLogDir.Location = '400,50'
-$textboxLogDir.Width += 200
+$textboxLogDir.Width += 300
 $textboxLogDir.Text = "$SQLLogDir"
 $main.Controls.Add($textboxLogDir)
 # Button LogDir
 $ButtonLogDir = New-Object System.Windows.Forms.Button
-$ButtonLogDir.Location = '700,50'
-$ButtonLogDir.Size = New-Object System.Drawing.Size(30,23)
+$ButtonLogDir.Location = '800,50'
+$ButtonLogDir.Size = New-Object System.Drawing.Size(30,20)
 $ButtonLogDir.Text = "..."
 $ButtonLogDir.Add_Click({
     $browseLogDir = New-Object system.windows.forms.FolderBrowserDialog
@@ -123,31 +123,17 @@ $LabelTitleSQL.AutoSize = $true
 $LabelTitleSQL.Font = New-Object System.Drawing.Font("Arial",12,[System.Drawing.FontStyle]::Bold)
 $main.Controls.Add($LabelTitleSQL)
 
-#User
-#Label User
-$Label1 = New-Object System.Windows.Forms.Label
-$Label1.Text = "User(has to be able to login to MSSQL):"
-$Label1.Location  = '10,125'
-$Label1.AutoSize = $true
-$main.Controls.Add($Label1)
-#Textbox User
-$textbox1 = New-Object System.Windows.Forms.TextBox
-$textbox1.Location = '10,145'
-$textbox1.Width += 50
-$textbox1.Text = "$username"
-$main.Controls.Add($textbox1)
-
 #SQLDB
 #Label SQLDB
 $LabelSQLDB = New-Object System.Windows.Forms.Label
 $LabelSQLDB.Text = "SQL Datenbank"
-$LabelSQLDB.Location  = '10,180'
+$LabelSQLDB.Location  = '10,130'
 $LabelSQLDB.AutoSize = $true
 $main.Controls.Add($LabelSQLDB)
 #Textbox SQLDB
 $textboxSQLDB = New-Object System.Windows.Forms.TextBox
-$textboxSQLDB.Location = '10,200'
-$textboxSQLDB.Width += 100
+$textboxSQLDB.Location = '10,150'
+$textboxSQLDB.Width += 50
 $TextboxSQLDB.Text = "$sqldatabase"
 $main.Controls.Add($textboxSQLDB)
 
@@ -155,28 +141,50 @@ $main.Controls.Add($textboxSQLDB)
 #Label SQLInst
 $LabelSQLInst = New-Object System.Windows.Forms.Label
 $LabelSQLInst.Text = "SQL Instance"
-$LabelSQLInst.Location  = '250,180'
+$LabelSQLInst.Location  = '250,130'
 $LabelSQLInst.AutoSize = $true
 $main.Controls.Add($LabelSQLInst)
 #Textbox SQLDB
 $textboxSQLInst = New-Object System.Windows.Forms.TextBox
-$textboxSQLInst.Location = '250,200'
+$textboxSQLInst.Location = '250,150'
 $textboxSQLInst.Text = "$SQLInstanz"
 $textboxSQLInst.Width += 200
 $main.Controls.Add($textboxSQLInst)
 
 #checkSQLSkript
 $checkSQLSkript = new-object System.Windows.Forms.checkbox
-$checkSQLSkript.Location = '600,195'
+$checkSQLSkript.Location = '600,145'
 $checkSQLSkript.Size = '250,30'
 $checkSQLSkript.Text = "Run SQL-Skript on specified database automatically"
-$checkSQLSkript.Checked = $false
+$checkSQLSkript.Checked = $true
 $main.Controls.Add($checkSQLSkript) 
+
+#LabelTitleUser
+$LabelTitleTime = New-Object System.Windows.Forms.Label
+$LabelTitleTime.Text = "User"
+$LabelTitleTime.Location  = '5,200'
+$LabelTitleTime.AutoSize = $true
+$LabelTitleTime.Font = New-Object System.Drawing.Font("Arial",12,[System.Drawing.FontStyle]::Bold)
+$main.Controls.Add($LabelTitleTime)
+
+#User
+#Label User
+$Label1 = New-Object System.Windows.Forms.Label
+$Label1.Text = "Windows User(has to be able to login to MSSQL):"
+$Label1.Location  = '10,225'
+$Label1.AutoSize = $true
+$main.Controls.Add($Label1)
+#Textbox User
+$textbox1 = New-Object System.Windows.Forms.TextBox
+$textbox1.Location = '10,245'
+$textbox1.Width += 50
+$textbox1.Text = "$username"
+$main.Controls.Add($textbox1)
 
 #Label TitleTime
 $LabelTitleTime = New-Object System.Windows.Forms.Label
 $LabelTitleTime.Text = "Time"
-$LabelTitleTime.Location  = '5,250'
+$LabelTitleTime.Location  = '5,290'
 $LabelTitleTime.AutoSize = $true
 $LabelTitleTime.Font = New-Object System.Drawing.Font("Arial",12,[System.Drawing.FontStyle]::Bold)
 $main.Controls.Add($LabelTitleTime)
@@ -185,13 +193,13 @@ $main.Controls.Add($LabelTitleTime)
 #Label Time
 $LabelTime = New-Object System.Windows.Forms.Label
 $LabelTime.Text = "Time to start the Backup"
-$LabelTime.Location  = '10,300'
+$LabelTime.Location  = '10,320'
 $LabelTime.AutoSize = $true
 $main.Controls.Add($LabelTime)
 #Textbox Time
 $textboxTime = New-Object System.Windows.Forms.TextBox
-$textboxTime.Location = '10,325'
-$textboxTime.Width += 100
+$textboxTime.Location = '10,340'
+$textboxTime.Width += 50
 $textboxTime.Text = $Time
 $main.Controls.Add($textboxTime)
 
@@ -199,14 +207,14 @@ $main.Controls.Add($textboxTime)
 #Label Deletebackupafter
 $Label2 = New-Object System.Windows.Forms.Label
 $Label2.Text = "Delete backup after(hours):"
-$Label2.Location  = '10,500'
+$Label2.Location  = '200,320'
 $Label2.AutoSize = $true
 $main.Controls.Add($Label2)
 #Textbox Deletebackupafter
 $textbox2 = New-Object System.Windows.Forms.TextBox
-$textbox2.Location = '160,500'
+$textbox2.Location = '200,340'
 $textbox2.Text = "$deletebackupafter"
-$textbox2.Width += 150
+$textbox2.Width += 50
 $main.Controls.Add($textbox2)
 
 #Label Info
